@@ -19,7 +19,7 @@ fs.createReadStream('./Shaw2018.csv')
             if(err) { console.log('error opening output file: ', err) }
 
             employees.forEach((employee) => {
-                fs.write(fd, `INSERT INTO employees VALUES("${employee.id}", "${employee.firstName}", "${employee.lastName}", "${employee.email}", 0);\r\n`);
+                fs.write(fd, `INSERT INTO employees VALUES(${employee.id}, "${employee.firstName}", "${employee.lastName}", "${employee.email}", 0);\r\n`);
             })
         })
     });

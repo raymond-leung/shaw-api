@@ -8,19 +8,23 @@ exports.rsvp = async (request, h) => {
         return h.response({ success: false, err: 'Invalid parameters' }).code(400);
     }
 
+    request.payload.guestEmployeeId = request.guestEmployeeId || null;
+
     try {
         //Check to see if employeeId is already attending on their own
-        const [alreadyAttendingRow, alreadyAttendingFields] = await pool.query("SELECT COUNT(*) AS cnt FROM rsvp WHERE status=1 AND employeeId=? LIMIT 1", [request.payload.guestEmployeeId]);
+        if(request.payload.guestEmployeeId) {
+            const [alreadyAttendingRow, alreadyAttendingFields] = await pool.query("SELECT COUNT(*) AS cnt FROM rsvp WHERE status=1 AND employeeId=? LIMIT 1", [request.payload.guestEmployeeId]);
 
-        if(alreadyAttendingRow[0] && alreadyAttendingRow[0].cnt) {
-            return h.response({ success: false, err: { message: "Guest already RSVP'd on their own"}, code: 1 }).code(409);
-        }
+            if(alreadyAttendingRow[0] && alreadyAttendingRow[0].cnt) {
+                return h.response({ success: false, err: { message: "Guest already RSVP'd on their own"}, code: 1 }).code(409);
+            }
 
-        //Check to see if employeeId is attending as someone else's guest
-        const [someonesGuestRow, someonesGuestFields] = await pool.query("SELECT COUNT(*) AS cnt FROM rsvp WHERE status=1 AND employeeId <> ? AND guestEmployeeId=? LIMIT 1", [credentials.empId, request.payload.guestEmployeeId]);
+            //Check to see if employeeId is attending as someone else's guest
+            const [someonesGuestRow, someonesGuestFields] = await pool.query("SELECT COUNT(*) AS cnt FROM rsvp WHERE status=1 AND employeeId <> ? AND guestEmployeeId=? LIMIT 1", [credentials.empId, request.payload.guestEmployeeId]);
 
-        if(someonesGuestRow && someonesGuestRow[0].cnt) {
-            return h.response({ success: false, err: { message: "Guest already attending with another employee" }, code: 2 }).code(409);
+            if(someonesGuestRow && someonesGuestRow[0].cnt) {
+                return h.response({ success: false, err: { message: "Guest already attending with another employee" }, code: 2 }).code(409);
+            }
         }
 
         const [rsvpRows, rsvpFields] = await pool.query('INSERT INTO rsvp (employeeId, status, guestName, guestEmployeeId, dietary, assistance, rsvpDateTime) VALUES (?, ?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE status=?, guestName=?, guestEmployeeId=?, dietary=?, assistance=?, updateDateTime=NOW()', [credentials.empId, request.payload.status, request.payload.guestName, request.payload.guestEmployeeId, request.payload.dietary, request.payload.assistance, request.payload.status, request.payload.guestName, request.payload.guestEmployeeId, request.payload.dietary, request.payload.assistance]);
