@@ -21,7 +21,7 @@ exports.login = async (request, h) => {
             return { isValid: true, token };
         }
     } catch(err) {
-        return Promise.reject(`authenticateUser error: ${err}`);
+//        return Promise.reject(`authenticateUser error: ${err}`);
         return h.response({ isValid: false, err }).code(401);
     }
 
