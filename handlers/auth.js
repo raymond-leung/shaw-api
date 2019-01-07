@@ -4,7 +4,7 @@ exports.login = async (request, h) => {
     const pool = request.mysql.pool;
 
     try {
-        const [rows, fields] = await pool.query('SELECT employeeId, isAdmin FROM employees WHERE employeeId = ? AND lastName = ? LIMIT 1', [request.payload.empId, request.payload.empLname]);
+        const [rows, fields] = await pool.query('SELECT employeeId, isAdmin FROM jay_employees WHERE employeeId = ? AND lastName = ? LIMIT 1', [request.payload.empId, request.payload.empLname]);
 
         if(rows[0] && rows[0].employeeId !== undefined) {
             const JWT = require('jsonwebtoken');
@@ -21,7 +21,6 @@ exports.login = async (request, h) => {
             return { isValid: true, token };
         }
     } catch(err) {
-//        return Promise.reject(`authenticateUser error: ${err}`);
         return h.response({ isValid: false, err }).code(401);
     }
 
