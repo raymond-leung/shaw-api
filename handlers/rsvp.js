@@ -22,7 +22,7 @@ exports.rsvp = async (request, h) => {
             }
 
             const [attendingRows, attendingFields] = await pool.query("SELECT COUNT(*) AS cnt FROM jay_employees WHERE status=1");
-attendingRows[0].cnt = 1000;
+
             if(attendingRows[0] && attendingRows[0].cnt >= process.env.MAX_ATTENDING && (prevRsvpRows[0].status !== 1 || (prevRsvpRows[0].status === 1 && prevRsvpRows[0].isWaitingList === 1))) {
                 const [waitingListRows, waitingListFields] = await pool.query('UPDATE jay_employees SET status=1, isWaitingList=1, alergies=? WHERE employeeId=? LIMIT 1', [request.payload.alergies, credentials.empId]);
                 responseObj.success = true;

@@ -11,15 +11,15 @@ fs.createReadStream('./jay.csv')
             id: data[0],
             lastName: data[1],
             firstName: data[2],
-            preferredName: data[3],
+            preferredName: data[2],
+            email: data[3],
             tenure: data[4],
-            title: data[5],
-            department: data[6],
-            location: data[7],
-            email: data[8],
-            manager: data[9],
+            location: data[5],
+            title: data[6],
+            department: data[7],
+            manager: data[8],
+            vp: data[9],
             over19: data[10] === 'OVER 19' ? true : false,
-            vp: data[11]
         });
     })
     .on("end", () => {

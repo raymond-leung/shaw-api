@@ -6,11 +6,11 @@ exports.list = async (request, h) => {
 
     try {
         if(status === null || status === 'null') {
-            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status IS NULL ORDER BY e.firstName ASC, e.lastName ASC');
+            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status isWaitingList, rsvpDateTime, alergies, status FROM jay_employees WHERE status IS NULL ORDER BY firstName ASC, lastName ASC');
 
             return notRespondedRows;
         } else {
-            const [rsvpRows, rsvpFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status=? ORDER BY e.firstName ASC, e.lastName ASC', [status]);
+            const [rsvpRows, rsvpFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status isWaitingList, rsvpDateTime, alergies, status FROM jay_employees WHERE status=? ORDER BY firstName ASC, lastName ASC', [status]);
 
             return rsvpRows;
         }
@@ -27,9 +27,9 @@ exports.getEmployee = async (request, h) => {
         let searchRows = [];
         let searchFields = [];
         if(Number.isInteger(parseInt(searchTerm))) {
-            [searchRows, searchFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE e.employeeId=? ORDER BY e.firstName ASC, e.lastName ASC', [searchTerm]);
+            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status isWaitingList, rsvpDateTime, alergies, status FROM jay_employees WHERE employeeId=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
         } else {
-            [searchRows, searchFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE e.lastName=? ORDER BY e.firstName ASC, e.lastName ASC', [searchTerm]);
+            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status isWaitingList, rsvpDateTime, alergies, status FROM jay_employees WHERE lastName=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
         }
 
         return searchRows;
@@ -59,7 +59,7 @@ exports.addEmployee = async (request, h) => {
     const pool = request.mysql.pool;
 
     try {
-        const [addRows, addFields] = await pool.query("INSERT INTO employees (employeeId, firstName, lastName, email) VALUES (?, ?, ?, ?)", [request.payload.employeeId, request.payload.firstName, request.payload.lastName, request.payload.email]);
+        const [addRows, addFields] = await pool.query("INSERT INTO jay_employees (employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [request.payload.employeeId, request.payload.firstName, request.payload.lastName, request.payload.preferredName, request.payload.tenure, request.payload.title, request.payload.department, request.payload.location, request.payload.email, request.payload.manager, request.payload.over19, request.payload.vp]);
 
         return addRows;
     } catch(err) {
@@ -75,16 +75,16 @@ exports.getCounts = async (request, h) => {
     try {
         const promiseArray = [];
         promiseArray.push(
-            pool.query("SELECT COUNT(*) AS cnt FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status IS NULL")
+            pool.query("SELECT COUNT(*) AS cnt FROM jay_employees WHERE status IS NULL")
         );
         promiseArray.push(
-            pool.query("SELECT COUNT(*) AS cnt FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status = 0")
+            pool.query("SELECT COUNT(*) AS cnt FROM jay_employees WHERE status = 0")
         );
         promiseArray.push(
-            pool.query("SELECT SUM(IF(guestName IS NULL or guestName = '', 1, 2)) AS cnt FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status = 1")
+            pool.query("SELECT COUNT(*) AS cnt FROM jay_employees WHERE status = 1")
         );
         promiseArray.push(
-            pool.query("SELECT COUNT(*) AS cnt FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status = 2")
+            pool.query("SELECT COUNT(*) AS cnt FROM jay_employees WHERE status = 2")
         );
         
         return Promise.all(promiseArray)
