@@ -6,11 +6,11 @@ exports.list = async (request, h) => {
 
     try {
         if(status === null || status === 'null') {
-            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status IS NULL ORDER BY e.firstName ASC, e.lastName ASC');
+            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, e.status, e.title, r.department FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status IS NULL ORDER BY e.firstName ASC, e.lastName ASC');
 
             return notRespondedRows;
         } else {
-            const [rsvpRows, rsvpFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status=? ORDER BY e.firstName ASC, e.lastName ASC', [status]);
+            const [rsvpRows, rsvpFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status, e.title, e.department FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE r.status=? ORDER BY e.firstName ASC, e.lastName ASC', [status]);
 
             return rsvpRows;
         }
@@ -27,7 +27,7 @@ exports.getEmployee = async (request, h) => {
         let searchRows = [];
         let searchFields = [];
         if(Number.isInteger(parseInt(searchTerm))) {
-            [searchRows, searchFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE e.employeeId=? ORDER BY e.firstName ASC, e.lastName ASC', [searchTerm]);
+            [searchRows, searchFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status, e.title, e.department FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE e.employeeId=? ORDER BY e.firstName ASC, e.lastName ASC', [searchTerm]);
         } else {
             [searchRows, searchFields] = await pool.query('SELECT e.employeeId, e.firstName, e.lastName, e.email, r.guestName, r.dietary, r.assistance, r.status FROM employees e LEFT JOIN rsvp r ON e.employeeId=r.employeeId WHERE e.lastName=? ORDER BY e.firstName ASC, e.lastName ASC', [searchTerm]);
         }
