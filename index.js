@@ -26,7 +26,7 @@ const jwtValidate = async (decoded, request) => {
 
     const pool = request.mysql.pool;
     try {
-        const [rows, fields] = await pool.query('SELECT COUNT(*) AS cnt FROM employees WHERE employeeId = ? AND lastName = ? LIMIT 1', [decoded.empId, decoded.empLname]);
+        const [rows, fields] = await pool.query('SELECT COUNT(*) AS cnt FROM jay_employees WHERE employeeId = ? AND lastName = ? LIMIT 1', [decoded.empId, decoded.empLname]);
 
         return { isValid: (rows[0].cnt === 1 ? true : false) };
     } catch(err) {
