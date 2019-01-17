@@ -42,12 +42,8 @@ exports.updateEmployee = async(request, h) => {
     const pool = request.mysql.pool;
     const employeeId = request.params.employeeId;
 
-    request.payload.guestEmployeeId = request.guestEmployeeId || null;
-
     try {
-        const [rsvpRows, rsvpFields] = await pool.query('INSERT INTO rsvp (employeeId, status, guestName, guestEmployeeId, dietary, assistance, rsvpDateTime) VALUES (?, ?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE status=?, guestName=?, guestEmployeeId=?, dietary=?, assistance=?, updateDateTime=NOW()', [employeeId, request.payload.status, request.payload.guestName, request.payload.guestEmployeeId, request.payload.dietary, request.payload.assistance, request.payload.status, request.payload.guestName, request.payload.guestEmployeeId, request.payload.dietary, request.payload.assistance]);
-
-        const [updateRows, updateFields] = await pool.query('UPDATE employees SET firstName=?, lastName=?, email=? WHERE employeeId=?  LIMIT 1', [request.payload.firstName, request.payload.lastName, request.payload.email, employeeId]);
+        const [updateRows, updateFields] = await pool.query('UPDATE jay_employees SET status=?, alergies=? WHERE employeeId=?  LIMIT 1', [request.payload.status, request.payload.alergies, employeeId]);
 
         return { success: true };
     } catch(err) {
