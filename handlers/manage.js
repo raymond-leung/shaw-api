@@ -6,11 +6,11 @@ exports.list = async (request, h) => {
 
     try {
         if(status === null || status === 'null') {
-            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE status IS NULL ORDER BY firstName ASC, lastName ASC');
+            const [notRespondedRows, notRespondedFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, title, department, location, email, manager, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE status IS NULL ORDER BY firstName ASC, lastName ASC');
 
             return notRespondedRows;
         } else {
-            const [rsvpRows, rsvpFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE status=? ORDER BY firstName ASC, lastName ASC', [status]);
+            const [rsvpRows, rsvpFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, title, department, location, email, manager, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE status=? ORDER BY firstName ASC, lastName ASC', [status]);
 console.log('rsvpRows: ', rsvpRows);
             return rsvpRows;
         }
@@ -27,9 +27,9 @@ exports.getEmployee = async (request, h) => {
         let searchRows = [];
         let searchFields = [];
         if(Number.isInteger(parseInt(searchTerm))) {
-            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE employeeId=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
+            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, title, department, location, email, manager, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE employeeId=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
         } else {
-            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE lastName=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
+            [searchRows, searchFields] = await pool.query('SELECT employeeId, firstName, lastName, preferredName, title, department, location, email, manager, vp, status, isWaitingList, rsvpDateTime, alergies FROM jay_employees WHERE lastName=? ORDER BY firstName ASC, lastName ASC', [searchTerm]);
         }
 
         return searchRows;
@@ -55,7 +55,8 @@ exports.addEmployee = async (request, h) => {
     const pool = request.mysql.pool;
 
     try {
-        const [addRows, addFields] = await pool.query("INSERT INTO jay_employees (employeeId, firstName, lastName, preferredName, tenure, title, department, location, email, manager, over19, vp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [request.payload.employeeId, request.payload.firstName, request.payload.lastName, request.payload.preferredName, request.payload.tenure, request.payload.title, request.payload.department, request.payload.location, request.payload.email, request.payload.manager, request.payload.over19, request.payload.vp]);
+        console.log('addEmployee payload: ', request.payload);
+        const [addRows, addFields] = await pool.query("INSERT INTO jay_employees (employeeId, firstName, lastName, preferredName, title, department, location, email, manager, vp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [request.payload.employeeId, request.payload.firstName, request.payload.lastName, request.payload.firstName, request.payload.title, request.payload.department, request.payload.location, request.payload.email, request.payload.manager, request.payload.vp]);
 
         return addRows;
     } catch(err) {
@@ -109,4 +110,64 @@ exports.getCounts = async (request, h) => {
             })
     } catch(err) {
     }    
+};
+
+exports.getTitles = async (request, h) => {
+    const pool = request.mysql.pool;
+
+    try {
+        const [titleRows, titleFields] = await pool.query('SELECT DISTINCT(title) FROM jay_employees ORDER BY title ASC');
+
+        return titleRows;
+    } catch(err) {
+        return h.response({ success: false, err}).code(400);
+    }
+};
+
+exports.getDepartments = async (request, h) => {
+    const pool = request.mysql.pool;
+
+    try {
+        const [departmentRows, departmentFields] = await pool.query('SELECT DISTINCT(department) FROM jay_employees ORDER BY department ASC');
+
+        return departmentRows;
+    } catch(err) {
+        return h.response({ success: false, err }).code(400);
+    }
+};
+
+exports.getLocations = async (request, h) => {
+    const pool = request.mysql.pool;
+
+    try {
+        const [locationRows, locationFields] = await pool.query('SELECT DISTINCT(location) FROM jay_employees ORDER BY location ASC');
+
+        return locationRows;
+    } catch(err) {
+        return h.response({ success: false, err }).code(400);
+    }
+};
+
+exports.getManagers = async (request, h) => {
+    const pool = request.mysql.pool;
+
+    try {
+        const [managerRows, managerFields] = await pool.query('SELECT DISTINCT(manager) FROM jay_employees ORDER BY manager ASC');
+
+        return managerRows;
+    } catch(err) {
+        return h.response({ success: false, err }).code(400);
+    }
+};
+
+exports.getVps = async (request, h) => {
+    const pool = request.mysql.pool;
+
+    try {
+        const [vpRows, vpFields] = await pool.query('SELECT DISTINCT(vp) FROM jay_employees ORDER BY vp ASC');
+
+        return vpRows;
+    } catch(err) {
+        return h.response({ success: false, err }).code(400);
+    }
 };

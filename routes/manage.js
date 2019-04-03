@@ -66,4 +66,64 @@ module.exports = [
         },
         handler: ManageHandler.addEmployee
     },
+    {
+        method: 'GET',
+        path: `/${apiPath}/${version}/manage/titles`,
+        config: {
+            cors: true,
+            auth: {
+                strategy: 'jwt',
+                scope: ['+admin']
+            }
+        },
+        handler: ManageHandler.getTitles
+    },
+    {
+        method: 'GET',
+        path: `/${apiPath}/${version}/manage/departments`,
+        config: {
+            cors: true,
+            auth: {
+                strategy: 'jwt',
+                scope: ['+admin']
+            }
+        },
+        handler: ManageHandler.getDepartments
+    },
+    {
+        method: 'GET',
+        path: `/${apiPath}/${version}/manage/locations`,
+        config: {
+            cors: true,
+            auth: { 
+                strategy: 'jwt',
+                scope: ['+admin']
+            }
+        },
+        handler: ManageHandler.getLocations
+    },
+    {
+        method: 'GET',
+        path: `/${apiPath}/${version}/manage/managers`,
+        config: {
+            cors: true,
+            auth: {
+                strategy: 'jwt',
+                scope: ['+admin']
+            }
+        },
+        handler: ManageHandler.getManagers
+    },
+    {
+        method: 'GET',
+        path: `/${apiPath}/${version}/manage/vps`,
+        config: {
+            cors: true,
+            auth: {
+                strategy: 'jwt',
+                scope: ['+admin']
+            }
+        },
+        handler: ManageHandler.getVps
+    }
 ];
